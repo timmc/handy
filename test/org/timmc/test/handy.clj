@@ -35,3 +35,18 @@
   ;; no non-sequential types
   (is (thrown? AssertionError (lexicomp {} [])))
   (is (thrown? AssertionError (lexicomp #{} []))))
+
+(deftest versions
+  (is (sequential? (version-norm "5.6")))
+  (are [a e] (= (version-norm a) e)
+       "0" []
+       "0.3.0.5.0.0" [0 3 0 5]
+       "67.1.12" [67 1 12]) ;; no splitting of multi-digit segments
+  (are [vs b] (= (boolean (apply version<= vs)) b)
+       ["1"] true ;; single element always true
+       ["0" "1" "1" "2"] true ;; need not be strictly increasing
+       ["1" "5" "0"] false ;; basic falsehood check
+       ["0.2" "0.2.0.0"] true ;; equality with trailing-zero stripping...
+       ["0.2.0.0" "0.2"] true ;; ...both ways
+       ["0.0.9" "0.1"] true ;; no zero-stripping on front
+       ["1.7" "18"] true)) ;; no splitting of multi-digit segments

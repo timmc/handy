@@ -21,3 +21,27 @@ do as little computation as possible.)"
           (if (zero? cmp)
             (recur (next main) (next other))
             cmp))))))
+
+(defn version-norm
+  "Convert a simple version into a sequential coll of integers with no
+trailing zero elements. For example, \"2.21.6.0.0\" => [2 21 6]. A version
+string is a dot-separated series of one or more integers."
+  [s]
+  {:pre [(string? s)]
+   :post [(sequential? %), (every? integer? %)]}
+  (->> s
+       (re-seq #"\d+")
+       (map #(Long/parseLong % 10))
+       reverse
+       (drop-while #{0})
+       reverse))
+
+(defn version<=
+  "Check that the versions are in monotonically increasing order (does not
+require strictly ascending.) Versions are strings of 1 or more dot-delimited
+integers. Trailing zeros will be ignored, as with 'version-norm. Returns
+logical true/false."
+  [v & more]
+  {:pre [(string? v), (every? string? more)]}
+  (let [vs (map version-norm (cons v more))]
+    (every? (complement pos?) (map lexicomp vs (next vs)))))
