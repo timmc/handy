@@ -1,0 +1,37 @@
+(ns org.timmc.test.handy
+  (:use [org.timmc.handy])
+  (:use [clojure.test]))
+
+(defn sign
+  "Compute the signum of the number as an integer. (-1, 0, or 1)"
+  [v]
+  (-> v double Math/signum int))
+
+(deftest selftest
+  (are [i o] (= (sign i) o)
+       0 0
+       0.0 0
+       1/3 1
+       -1e3 -1
+       5 1
+       -6 -1
+       5M 1
+       -2N -1))
+
+;;;; on to the real tests
+
+(deftest lexicographic
+  (are [main other out] (= (sign (lexicomp main other))
+                           (sign out))
+       [] nil 0 ;; equality of nil and []
+       nil [1 2] -1 ;; nil is low
+       [1 2] [] 1 ;; so is []
+       [1 0] [1] 1 ;; 0 beats end
+       [1 2] [1 2] 0 ;; general equality
+       [9] [1 1 1] 1 ;; values beat length (cf. clojure.core/compare)
+       [1] [9 9 9] -1 ;; unless they agree, of course!
+       (range 5) [0 1 2 3] 1 ;; seqs against vectors
+       () [] 0) ;; and lists
+  ;; no non-sequential types
+  (is (thrown? AssertionError (lexicomp {} [])))
+  (is (thrown? AssertionError (lexicomp #{} []))))
