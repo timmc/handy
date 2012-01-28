@@ -12,6 +12,16 @@ The main namespace is `org.timmc.handy`:
 
 `(use '[org.timmc.handy :only (lexicomp)]) ; e.g.`
 
+## Building
+
+Built with Leiningen 1.x
+
+## Changelog
+
+### v1.0.0
+* Initial release
+* handy.clj: `lexicomp`, `version-norm`, `version<=`
+
 ## License
 
 Copyright (C) 2012 Tim McCormack
