@@ -31,9 +31,9 @@ string is a dot-separated series of one or more integers."
    :post [(sequential? %), (every? integer? %)]}
   (->> s
        (re-seq #"\d+")
-       (map #(Long/parseLong % 10))
+       (map #(Integer/parseInt % 10))
        reverse
-       (drop-while #{0})
+       (drop-while zero?)
        reverse))
 
 (defn version<=

@@ -16,7 +16,7 @@
        5 1
        -6 -1
        5M 1
-       -2N -1))
+       (java.math.BigInteger/valueOf -2) -1))
 
 ;;;; on to the real tests
 
