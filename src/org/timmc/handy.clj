@@ -3,7 +3,7 @@
 
 ;;;; Comparisons
 
-(defn lexicomp
+(defn ^{:since "1.0.0"} lexicomp
   "Compare two sequential collections lexicographically, returning a
 positive integer if the first argument is greater than the other
 argument, as in Java's Comparable. (Negative for other order, zero for equal.)
@@ -24,7 +24,7 @@ do as little computation as possible.)"
             (recur (next main) (next other))
             cmp))))))
 
-(defn version-norm
+(defn ^{:since "1.0.0"} version-norm
   "Convert a simple version into a sequential coll of integers with no
 trailing zero elements. For example, \"2.21.6.0.0\" => [2 21 6]. A version
 string is a dot-separated series of one or more integers."
@@ -38,7 +38,7 @@ string is a dot-separated series of one or more integers."
        (drop-while zero?)
        reverse))
 
-(defn version<=
+(defn ^{:since "1.0.0"} version<=
   "Check that the versions are in monotonically increasing order (does not
 require strictly ascending.) Versions are strings of 1 or more dot-delimited
 integers. Trailing zeros will be ignored, as with 'version-norm. Returns
