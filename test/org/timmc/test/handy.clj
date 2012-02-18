@@ -57,14 +57,15 @@
 
 (def test-a 8)
 
-(deftest no-escape
+(deftest no-escape-or-capture
   (is (nil? (resolve 'join)))
-  (is (= 8 @#'test-a)) ;; TODO: Why does resolve fail here?
-  (is (= (in-temp-ns
-          [(use '[clojure.string :only (join)])]
-          (if (resolve 'test-a)
-            (throw (AssertionError. "Should not have been able to see test-a")))
-          (join \, (range 5))))
-      "0,1,2,3,4")
+  (is (= test-a 8)) ;; TODO: Why does resolve fail here?
+  (is (= (with-temp-ns [(use '[clojure.string :only (join)])
+                        (def test-inner-b 12)]
+           (if (resolve 'test-a)
+             (throw (AssertionError. "Should not have resolved #'test-a")))
+           [test-inner-b, (join \, (range 5))]))
+      [12, "0,1,2,3,4"])
+  (is (nil? (resolve 'test-inner-b)))
   (is (nil? (resolve 'join)))
   (is (= 8 (deref (resolve 'test-a)))))

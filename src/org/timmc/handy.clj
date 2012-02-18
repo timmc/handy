@@ -50,26 +50,20 @@ logical true/false."
 
 ;;;; Sandboxing
 
-(defmacro in-temp-ns
+(defmacro with-temp-ns
   "Run some code in a namespace sandbox. Must be a top-level form."
   [[& ns-modifiers] & exprs]
   (let [old-ns (.name *ns*)
-        tmp-ns (gensym 'sandbox)
-        restore `((in-ns '~old-ns)
-                  (remove-ns '~tmp-ns))]
+        tmp-ns (gensym 'sandbox)]
     (list
      'do ;; namespace modification must occur in a top-level 'do
      `(in-ns '~tmp-ns)
      '(clojure.core/refer 'clojure.core)
-     ;; eval allows us to catch compile errors
+     ;; eval allows us to 1) catch compile errors, and 2) put both ns-modifying
+     ;; and ns-using forms in the same top-level form (for conciseness.)
      `(try
         (eval '~(cons 'do ns-modifiers))
-        (catch Throwable t#
-          ~@restore
-          (throw (Throwable. t#))))
-     ;; now that namespace has been modified, this second top-level form
-     ;; can take advantage of the new bindings
-     `(try
         (eval '~(cons 'do exprs))
         (finally
-         ~@restore)))))
+         (in-ns '~old-ns)
+         (remove-ns '~tmp-ns))))))
