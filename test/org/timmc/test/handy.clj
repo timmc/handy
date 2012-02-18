@@ -2,6 +2,8 @@
   (:use [org.timmc.handy])
   (:use [clojure.test]))
 
+;;;; testing
+
 (defn sign
   "Compute the signum of the number as an integer. (-1, 0, or 1)"
   [v]
@@ -18,7 +20,7 @@
        5M 1
        (java.math.BigInteger/valueOf -2) -1))
 
-;;;; on to the real tests
+;;;; Comparisons
 
 (deftest lexicographic
   (are [main other out] (= (sign (lexicomp main other))
@@ -50,3 +52,19 @@
        ["0.2.0.0" "0.2"] true ;; ...both ways
        ["0.0.9" "0.1"] true ;; no zero-stripping on front
        ["1.7" "18"] true)) ;; no splitting of multi-digit segments
+
+;;;; Sandboxing
+
+(def test-a 8)
+
+(deftest no-escape
+  (is (nil? (resolve 'join)))
+  (is (= 8 @#'test-a)) ;; TODO: Why does resolve fail here?
+  (is (= (in-temp-ns
+          [(use '[clojure.string :only (join)])]
+          (if (resolve 'test-a)
+            (throw (AssertionError. "Should not have been able to see test-a")))
+          (join \, (range 5))))
+      "0,1,2,3,4")
+  (is (nil? (resolve 'join)))
+  (is (= 8 (deref (resolve 'test-a)))))

@@ -1,6 +1,8 @@
 (ns org.timmc.handy
   "Main utility namespace.")
 
+;;;; Comparisons
+
 (defn lexicomp
   "Compare two sequential collections lexicographically, returning a
 positive integer if the first argument is greater than the other
@@ -45,3 +47,29 @@ logical true/false."
   {:pre [(string? v), (every? string? more)]}
   (let [vs (map version-norm (cons v more))]
     (every? (complement pos?) (map lexicomp vs (next vs)))))
+
+;;;; Sandboxing
+
+(defmacro in-temp-ns
+  "Run some code in a namespace sandbox. Must be a top-level form."
+  [[& ns-modifiers] & exprs]
+  (let [old-ns (.name *ns*)
+        tmp-ns (gensym 'sandbox)
+        restore `((in-ns '~old-ns)
+                  (remove-ns '~tmp-ns))]
+    (list
+     'do ;; namespace modification must occur in a top-level 'do
+     `(in-ns '~tmp-ns)
+     '(clojure.core/refer 'clojure.core)
+     ;; eval allows us to catch compile errors
+     `(try
+        (eval '~(cons 'do ns-modifiers))
+        (catch Throwable t#
+          ~@restore
+          (throw (Throwable. t#))))
+     ;; now that namespace has been modified, this second top-level form
+     ;; can take advantage of the new bindings
+     `(try
+        (eval '~(cons 'do exprs))
+        (finally
+         ~@restore)))))
