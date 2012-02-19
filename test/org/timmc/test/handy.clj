@@ -69,3 +69,14 @@
   (is (nil? (resolve 'test-inner-b)))
   (is (nil? (resolve 'join)))
   (is (= 8 (deref (resolve 'test-a)))))
+
+(deftest get-errors
+  ;; error in body
+  (is (thrown-with-msg? Throwable #"testing-body" ;; might be wrapped exception
+        (with-temp-ns [] (throw (RuntimeException. "testing-body")))))
+  ;; error in ns
+  (is (thrown-with-msg? Throwable #"testing-ns"
+        (with-temp-ns [(throw (RuntimeException. "testing-ns"))])))
+  ;; even compilation errors
+  (is (thrown? clojure.lang.Compiler$CompilerException
+               (with-temp-ns [(no-such 5 6 7)] (+ 4 5)))))
