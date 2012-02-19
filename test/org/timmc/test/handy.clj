@@ -85,3 +85,21 @@
   ;; even compilation errors
   (is (thrown? clojure.lang.Compiler$CompilerException
                (with-temp-ns [(no-such 5 6 7)] (+ 4 5)))))
+
+(deftest runtime-sequential-ns
+  (is (= (with-temp-ns [(import 'java.awt.Point)
+                        (def a (.getCanonicalName Point))]
+           a)
+         "java.awt.Point")))
+
+(defmacro resolver
+  [name-sym]
+  (when-not (resolve name-sym)
+    (throw (RuntimeException. "Could not resolve"))))
+
+(deftest compile-sequential-ns
+  (is (= (with-temp-ns [(import 'java.awt.Shape)
+                        (require 'org.timmc.test.handy)
+                        (def a (org.timmc.test.handy/resolver Shape))]
+           (+ 2 3))
+         5)))
