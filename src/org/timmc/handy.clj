@@ -50,7 +50,7 @@ logical true/false."
 
 ;;;; Sandboxing
 
-(defmacro with-temp-ns
+(defmacro ^{:since "1.1.0"} with-temp-ns
   "Run some code in a namespace sandbox. Must be a top-level form."
   [[& ns-modifiers] & exprs]
   (let [old-ns (.name *ns*)

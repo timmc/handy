@@ -27,6 +27,9 @@ Built with Leiningen 1.x
 ### v1.0.1
 * Compatibility down to Clojure 1.2.0
 
+### v1.1.0
+* Add `with-temp-ns`, a sandboxing macro (may move to a different ns in future)
+
 ## License
 
 Copyright (C) 2012 Tim McCormack
