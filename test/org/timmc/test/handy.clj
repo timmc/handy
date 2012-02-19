@@ -59,15 +59,20 @@
 
 (deftest no-escape-or-capture
   (is (nil? (resolve 'join)))
+  (is (nil? (resolve 'Color)))
   (is (= test-a 8)) ;; TODO: Why does resolve fail here?
   (is (= (with-temp-ns [(use '[clojure.string :only (join)])
+                        (import 'java.awt.Color)
                         (def test-inner-b 12)]
+           (if (resolve 'with-temp-ns)
+             (throw (AssertionError. "Oops, captured outer 'use")))
            (if (resolve 'test-a)
              (throw (AssertionError. "Should not have resolved #'test-a")))
-           [test-inner-b, (join \, (range 5))]))
-      [12, "0,1,2,3,4"])
+           [test-inner-b, (class Color), (join \, (range 5))])
+         [12, Class, "0,1,2,3,4"]))
   (is (nil? (resolve 'test-inner-b)))
   (is (nil? (resolve 'join)))
+  (is (nil? (resolve 'Color)))
   (is (= 8 (deref (resolve 'test-a)))))
 
 (deftest get-errors
