@@ -51,7 +51,7 @@ logical true/false."
 ;;;; Sandboxing
 
 (defmacro ^{:since "1.1.0"} with-temp-ns
-  "Run some code in a namespace sandbox. Must be a top-level form."
+  "Run some code in a namespace sandbox."
   [[& ns-modifiers] & exprs]
   (let [old-ns (.name *ns*)
         tmp-ns (gensym 'sandbox)]
