@@ -103,3 +103,9 @@
                         (def a (org.timmc.test.handy/resolver Shape))]
            (+ 2 3))
          5)))
+
+;;;; Structural
+
+(deftest indexing
+  (is (= (index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}] (juxt :a :b) [:c])
+         {[0 1] {:c 2}, [3 4] {:c 5}})))

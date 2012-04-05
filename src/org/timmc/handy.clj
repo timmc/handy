@@ -67,3 +67,16 @@ logical true/false."
         (finally
          (in-ns '~old-ns)
          (remove-ns '~tmp-ns))))))
+
+;;;; Structural manipulation
+
+(defn ^{:since "1.2.0"} index-on
+  "From a table (coll of record maps) produce a map of index key values
+to projections on the other keys. r->k is a function of a record to some
+key value, e.g. #(get % 5) or (juxt :a :b) or just :c.
+
+Example: (index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}] :a [:b])
+         => {0 {:b 1}, 3 {:b 4}}"
+  [table r->k keep-keys]
+  (into {} (for [record table]
+             [(r->k record) (select-keys record keep-keys)])))

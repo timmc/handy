@@ -30,6 +30,9 @@ Built with Leiningen 1.x
 ### v1.1.0
 * Add `with-temp-ns`, a sandboxing macro (may move to a different ns in future)
 
+### v1.2.0
+* Add `index-on`, a generalization of group-by
+
 ## License
 
 Copyright (C) 2012 Tim McCormack
