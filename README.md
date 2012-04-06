@@ -6,7 +6,7 @@ Just some handy utilities. The API is any public function not marked ^:internal.
 
 If you use Leiningen, add the following to your project.clj dependencies:
 
-`[org.timmc/handy "1.0.1"]`
+`[org.timmc/handy "1.2.0"]`
 
 The main namespace is `org.timmc.handy`:
 
