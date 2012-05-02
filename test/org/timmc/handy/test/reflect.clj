@@ -14,5 +14,6 @@
          {:type :method, :name "equalsIgnoreCase", :return Boolean/TYPE,
           :visibility :public, :abstract? false, :params [String],
           :varargs? false}))
-  (is (= (methods Void) []))
-  (is (= (methods Object) (methods Void {:ancestors true}))))
+  (let [c (class {})]
+    (is (= (set (methods c {:ancestors true}))
+           (set (mapcat methods (cons c (ancestors c))))))))
