@@ -1,6 +1,6 @@
 (ns org.timmc.handy.reflect
-  (:import (java.lang.reflect Member Field Method Constructor Modifier)))
-
+  (:import (java.lang.reflect Member Field Method Constructor Modifier))
+  (:refer-clojure :exclude (methods)))
 
 (def ^:private vis-levels {:public 3 :protected 2 :package 1 :private 0})
 
@@ -17,9 +17,36 @@
           (Modifier/isPrivate mod) :private
           :else :package)))
 
+(defn fields
+  "Return fields as maps of {:type :field, :name String, :return Class,
+:visibility? kw, :static? bool}"
+  ([^Class c, opts]
+     (if (:ancestors opts)
+       (mapcat #(fields % (dissoc opts :ancestors))
+               (conj (ancestors c) c))
+       (for [m (.getDeclaredFields c)]
+         (let [mod (.getModifiers c)]
+           {:type :field, :name (.getName m), :visibility (visibility m),
+            :static? (Modifier/isStatic mod), :return (.getType m)}))))
+  ([^Class c] (fields c {})))
+
+(defn constructors
+  "Return constructors as maps of {:type :constructor, :params [Class...],
+:varargs? bool, :visibility? kw}"
+  ([^Class c, opts]
+     (if (:ancestors opts)
+       (mapcat #(constructors % (dissoc opts :ancestors))
+               (conj (ancestors c) c))
+       (for [m (.getDeclaredConstructors c)]
+         (let [mod (.getModifiers c)]
+           {:type :constructor, :params (vec (.getParameterTypes m)),
+            :varargs? (.isVarArgs m), :visibility (visibility m)}))))
+  ([^Class c] (constructors c {})))
+
 (defn methods
   "Return methods as maps of {:type :method, :name String, :return Class,
-:params [Class...], :varargs? bool, :abstract? bool, :visibility? kw}"
+:params [Class...], :varargs? bool, :abstract? bool, :visibility? kw,
+:static? bool}"
   ([^Class c, opts]
      (if (:ancestors opts)
        (mapcat #(methods % (dissoc opts :ancestors))
@@ -28,5 +55,6 @@
          (let [mod (.getModifiers c)]
            {:type :method, :name (.getName m), :return (.getReturnType m),
             :visibility (visibility m), :abstract? (Modifier/isAbstract mod),
-            :params (vec (.getParameterTypes m)), :varargs? (.isVarArgs m)}))))
+            :params (vec (.getParameterTypes m)), :varargs? (.isVarArgs m),
+            :static? (Modifier/isStatic mod)}))))
   ([^Class c] (methods c {})))
