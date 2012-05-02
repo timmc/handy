@@ -19,10 +19,11 @@
 
 (defn methods
   "Return methods as maps of {:type :method, :name String, :return Class,
-:params [Class...], :varargs?"
+:params [Class...], :varargs? bool, :abstract? bool, :visibility? kw}"
   ([^Class c, opts]
      (if (:ancestors opts)
-       (mapcat #(methods % (dissoc opts :ancestors)) (conj (bases c) c))
+       (mapcat #(methods % (dissoc opts :ancestors))
+               (conj (ancestors c) c))
        (for [m (.getDeclaredMethods c)]
          (let [mod (.getModifiers c)]
            {:type :method, :name (.getName m), :return (.getReturnType m),
