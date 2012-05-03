@@ -13,7 +13,7 @@
 (deftest field
   (is (= (first (filter (comp #{"SIZE"} :name) (fields Long)))
          {:type :field, :name "SIZE", :return Integer/TYPE,
-          :visibility :public, :static? false})))
+          :visibility :public, :static? true})))
 
 (deftest constr
   (is (= (first (constructors Enum))

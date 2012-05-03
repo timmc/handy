@@ -25,7 +25,7 @@
        (mapcat #(fields % (dissoc opts :ancestors))
                (conj (ancestors c) c))
        (for [m (.getDeclaredFields c)]
-         (let [mod (.getModifiers c)]
+         (let [mod (.getModifiers m)]
            {:type :field, :name (.getName m), :visibility (visibility m),
             :static? (Modifier/isStatic mod), :return (.getType m)}))))
   ([^Class c] (fields c {})))
@@ -38,7 +38,7 @@
        (mapcat #(constructors % (dissoc opts :ancestors))
                (conj (ancestors c) c))
        (for [m (.getDeclaredConstructors c)]
-         (let [mod (.getModifiers c)]
+         (let [mod (.getModifiers m)]
            {:type :constructor, :params (vec (.getParameterTypes m)),
             :varargs? (.isVarArgs m), :visibility (visibility m)}))))
   ([^Class c] (constructors c {})))
@@ -52,7 +52,7 @@
        (mapcat #(methods % (dissoc opts :ancestors))
                (conj (ancestors c) c))
        (for [m (.getDeclaredMethods c)]
-         (let [mod (.getModifiers c)]
+         (let [mod (.getModifiers m)]
            {:type :method, :name (.getName m), :return (.getReturnType m),
             :visibility (visibility m), :abstract? (Modifier/isAbstract mod),
             :params (vec (.getParameterTypes m)), :varargs? (.isVarArgs m),
