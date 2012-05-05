@@ -1,6 +1,7 @@
 (ns org.timmc.handy.repl
   (:require [clojure.string :as str]
-            [org.timmc.handy.reflect :as rf]))
+            [org.timmc.handy.reflect :as rf]
+            [clojure.set :as set]))
 
 (defn- vis-str
   [kw]
@@ -10,7 +11,8 @@
   [m]
   (if (:static? m) "st" "  "))
 
-(def ^:dynamic *fq* false)
+(def ^:dynamic *fq* "True for fully-qualified classnames in output."
+  false)
 
 (defn ^:internal format-classname
   [cls]
@@ -45,30 +47,38 @@
   [ms]
   (sort-by (comp not :static?) (sort-by :name ms)))
 
-;;(defmulti filter-return type)
-
 (defn show
   "Print the methods, constructors, and fields of the class of the provided
 value (or the class itself, if a Class subclass is provided.) Options are
 entered in an optional map, with allowed values:
 * :level <lvl> - Minimum visibility of members to show. lvl may be :public
   (the default), :protected, :package, or :private.
-* :fq <bool> - If true, show fully-qualified classnames. Default false."
+* :fq <bool> - If true, show fully-qualified classnames. Default false.
+* :return <class> - If set, restrict output to fields and methods whose return
+  value is assignable to this type.
+* :inherit <bool> - If true, include inherited members."
   ([v {:as specs
-       :keys [level fq]
-       :or {level :public, fq false}}]
-     {:pre [(contains? #{:public :protected :package :private} level)]}
+       :keys [level fq return inherit]
+       :or {level :public, fq false, return nil, inherit false}}]
+     {:pre [(contains? #{:public :protected :package :private} level)
+            (or (nil? return) (class? return))]}
      (let [cl (if (class? v) v (class v))
-           members {:Fields (rf/fields cl)
-                    :Constructors (rf/constructors cl)
-                    :Methods (rf/methods cl)}]
+           rf-opts (set/rename-keys (dissoc specs [:level :fq :return])
+                                    {:inherit :ancestors})
+           members {:Fields (rf/fields cl rf-opts)
+                    :Constructors (rf/constructors cl rf-opts)
+                    :Methods (rf/methods cl rf-opts)}]
        (binding [*fq* fq]
          (println (format-classname cl))
          (println "Bases:" (map format-classname (bases cl)))
          (doseq [t [:Fields :Constructors :Methods]]
-           (when-let [ms (filter #(rf/vis>= (:visibility %) level)
-                                 (get members t :DONE_BROKE))]
-             (println (str (name t) ":"))
+           (println (str (name t) ":"))
+           (let [filter-return (if (:return specs)
+                                 (partial filter #(isa? (:return %) return))
+                                 identity)
+                 ms (->> (get members t :BUG_HERE)
+                         (filter #(rf/vis>= (:visibility %) level))
+                         filter-return)]
              (doseq [m (sort-members ms)]
                (println (write-member m))))))
        (symbol "") ;; stupid hack to not show a nil after the printout
