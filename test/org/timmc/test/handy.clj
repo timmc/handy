@@ -109,3 +109,17 @@
 (deftest indexing
   (is (= (index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}] (juxt :a :b) [:c])
          {[0 1] {:c 2}, [3 4] {:c 5}})))
+
+;;;; Mutation
+
+(deftest splitting
+  (let [a (atom (range 10))]
+    (is (= (split-atom! a first rest) 0))
+    (is (= @a (range 1 10)))))
+
+;;;; Testing
+
+(deftest calvinism
+  (let [f (deterministic 0 1 2 3 4)]
+    (is (= (map f [:a :b :c :d]) (range 0 4)))
+    (is (= (f 'various 'things) 4))))

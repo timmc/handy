@@ -6,13 +6,11 @@ Just some handy utilities. The API is any public function not marked ^:internal.
 
 If you use Leiningen, add the following to your project.clj dependencies:
 
-`[org.timmc/handy "1.2.0"]`
+`[org.timmc/handy "1.3.0"]`
 
-The main namespace is `org.timmc.handy`:
+The main namespace is `org.timmc.handy`.
 
-`(use '[org.timmc.handy :only (lexicomp)]) ; e.g.`
-
-Compatible with Clojure 1.2.1 and 1.3.0.
+Compatible with Clojure 1.2.0 through 1.4.0.
 
 ## Building
 
@@ -32,6 +30,10 @@ Built with Leiningen 2, but should be buildable with 1.x as well.
 
 ### v1.2.0
 * Add `index-on`, a generalization of group-by
+
+### v1.3.0
+* Add `split-atom!` and `deterministic`
+* Tested up to Clojure 1.5.0-RC2
 
 ## License
 

@@ -80,3 +80,30 @@ Example: (index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}] :a [:b])
   [table r->k keep-keys]
   (into {} (for [record table]
              [(r->k record) (select-keys record keep-keys)])))
+
+;;;; Mutation
+
+(defn ^{:since "1.3.0"} split-atom!
+  "Swap an atom with the `keep` function and produce the corresponding
+result of applying `return` to the old value. Thread-safe.
+
+This is useful if you want to remove a value from a collection in an atom
+but also return the value."
+  [a return keep]
+  (let [r (atom nil)]
+    (swap! a (fn splitter [old]
+               (reset! r (return old))
+               (keep old)))
+    @r))
+
+;;;; Testing
+
+(defn ^{:since "1.3.0"} deterministic
+  "Return a function that will return each of the given values in
+sequence when called multiple times. Behavior unspecified if called
+more times than there are values.
+
+Recommended for use in combination with with-redefs."
+  [& returns]
+  (let [remaining (atom returns)]
+    (fn determined [& _] (split-atom! remaining first rest))))
