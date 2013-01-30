@@ -16,7 +16,7 @@ Compatible with Clojure 1.2.1 and 1.3.0.
 
 ## Building
 
-Built with Leiningen 1.x
+Built with Leiningen 2, but should be buildable with 1.x as well.
 
 ## Changelog
 
@@ -35,6 +35,6 @@ Built with Leiningen 1.x
 
 ## License
 
-Copyright (C) 2012 Tim McCormack
+Copyright (C) 2012–2013 Tim McCormack
 
 Distributed under the Eclipse Public License, the same as Clojure.
