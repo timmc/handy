@@ -107,3 +107,73 @@ Recommended for use in combination with with-redefs."
   [& returns]
   (let [remaining (atom returns)]
     (fn determined [& _] (split-atom! remaining first rest))))
+
+;;;; Calculations
+
+(defn paging
+  "Derive paging information from a record count and requested page index.
+
+Input:
+
+* `total` - Total number of records available for paging through.
+* `cur-page` - Requested page index, 0-based. Must be non-negative integer.
+* `per-page` - Number of records to display per page.
+
+The output is a map. The following keys are always present:
+
+* `:total` - From input.
+* `:cur-page` - From input.
+* `:per-page` - From input.
+* `:has-records` - True iff `total` was not 0.
+* `:cur-valid` - True iff `cur-page` indexes a page containing results.
+
+If `total` is not 0, the following keys will also be present:
+
+* `:first-page` - Index of first page (always 0.)
+* `:last-page` - Index of last page containing records.
+* `:last-page-size` - Number of records on last page.
+
+If `:cur-valid` is true (`total` is not 0 and `cur-page` is in bounds), the
+following keys will also be present:
+
+* `:has-prev` - True iff `(dec cur-page)` is a valid page index.
+* `:has-next` - True iff `(inc cur-page)` is a valid page index.
+* `:first-record` - Offset of first record on page, 0-based. Page 0 starts with
+  record 0.
+* `:last-record` - Offset of last record on page, 0-based.
+
+No other keys will be present."
+  [total cur-page per-page]
+  {:pre [(not (neg? cur-page)), (not (neg? total)), (pos? per-page)]}
+  (assoc
+      (let [has-records (not (zero? total))
+            full-pages (quot total per-page)
+            last-page-size (rem total per-page) ;; may be 0 & need to recalc
+            last-page-full? (zero? last-page-size)
+            last-page-size (if last-page-full? per-page last-page-size)
+            last-page (if last-page-full? (dec full-pages) full-pages)
+            on-page (if (= cur-page last-page) last-page-size per-page)
+            in-bounds (<= 0 cur-page last-page)
+            first-record (* per-page cur-page)
+            last-record (+ first-record (dec on-page))]
+        (if-not has-records
+          {:has-records false
+           :cur-valid false}
+          (let [baseline {:has-records true
+                          :first-page 0
+                          :last-page last-page
+                          :last-page-size last-page-size}]
+            (if-not in-bounds
+              ;; just return overall bounds information
+              (assoc baseline :cur-valid false)
+              ;; if page is valid, add info on page stats
+              (assoc baseline
+                :cur-valid true
+                :has-prev (not= cur-page 0)
+                :has-next (not= cur-page last-page)
+                :first-record first-record
+                :last-record last-record)))))
+    ;; always attach the inputs
+    :total total
+    :cur-page cur-page
+    :per-page per-page))
