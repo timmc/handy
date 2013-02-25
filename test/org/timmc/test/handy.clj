@@ -158,3 +158,44 @@
   (let [f (deterministic 0 1 2 3 4)]
     (is (= (map f [:a :b :c :d]) (range 0 4)))
     (is (= (f 'various 'things) 4))))
+
+;;;; Calculations
+
+(deftest pagination
+  (testing "error conditions"
+    (are [total cp result] (= (paging total cp 10)
+                              (assoc result
+                                :total total, :cur-page cp, :per-page 10))
+         ;; empty -- always invalid
+         0 0 {:has-records false, :cur-valid false}
+         0 5 {:has-records false, :cur-valid false}
+         ;; out of bounds
+         25 3 {:has-records true, :cur-valid false
+               :first-page 0, :last-page 2
+               :last-page-size 5}
+         30 3 {:has-records true, :cur-valid false
+               :first-page 0, :last-page 2
+               :last-page-size 10}))
+  (testing "normal conditions (3 pages)"
+    (let [constant {:has-records true, :cur-valid true,
+                    :first-page 0, :last-page 2}]
+      (are [total cp result] (= (paging total cp 10)
+                                (assoc (into result constant)
+                                  :total total, :cur-page cp, :per-page 10))
+           ;; ragged results (last page not full)
+           21 2 {:has-prev true, :has-next false
+                 :first-record 20, :last-record 20
+                 :last-page-size 1}
+           25 0 {:has-prev false, :has-next true
+                 :first-record 0, :last-record 9
+                 :last-page-size 5}
+           25 1 {:has-prev true, :has-next true
+                 :first-record 10, :last-record 19
+                 :last-page-size 5}
+           25 2 {:has-prev true, :has-next false
+                 :first-record 20, :last-record 24
+                 :last-page-size 5}
+           ;; non-ragged results
+           30 2 {:has-prev true, :has-next false
+                 :first-record 20, :last-record 29
+                 :last-page-size 10}))))
