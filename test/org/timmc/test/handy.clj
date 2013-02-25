@@ -20,6 +20,41 @@
        5M 1
        (java.math.BigInteger/valueOf -2) -1))
 
+;;;; Control flow
+
+(deftest multi-clause
+  (testing "no execution of else-expr if then-expr is invoked"
+    (let [mutation (atom 0)]
+      (is (= (if-let+ [[a b] (range 5 10)
+                       c (+ a b)]
+                      c
+                      (swap! mutation inc))
+             11))
+      (is (zero? @mutation))))
+  (testing "no execution of then-expr if else-expr is invoked"
+    (let [mutation (atom 0)]
+      (is (= (if-let+ [[a b] (range 5 10)
+                       c (= a b)]
+                      (swap! mutation inc)
+                      :else-clause)
+             :else-clause))
+      (is (zero? @mutation))))
+  (testing "short-circuiting of bindings"
+    (let [mutation (atom [])]
+      (is (= (if-let+ [[a b] (range 5 10)
+                       c (= a b)
+                       d (swap! mutation conj :d)]
+                      (swap! mutation conj :then)
+                      (do (swap! mutation conj :else)
+                          :else-clause))
+             :else-clause))
+      (is (= @mutation [:else]))))
+  (testing "degenerate case"
+    (is (= (if-let+ [] 4 5) 4)))
+  (testing "no throwing things away"
+    (is (thrown-with-msg? Exception #"bindings.*even"
+          (macroexpand-1 '(if-let+ [one] 2 3))))))
+
 ;;;; Comparisons
 
 (deftest lexicographic

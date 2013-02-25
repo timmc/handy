@@ -1,6 +1,28 @@
 (ns org.timmc.handy
   "Main utility namespace.")
 
+;;;; Control flow
+
+(defmacro if-let+
+  "Like if-let, but with multiple bindings. If any binding evaluates to
+false or nil, the else expression is evaluated and returned, and the
+remaining bindings are not evaluated. The else-expression cannot use any
+of the bindings, and the then-expression may use all of them."
+  [bindings then-expr else-expr]
+  (when-not (vector? bindings)
+    (throw (RuntimeException. "if-let+ requires a vector for the bindings")))
+  (when-not (even? (count bindings))
+    (throw (RuntimeException. "if-let+ bindings count must be even")))
+  (let [else-sym (gensym "else_")]
+    `(let [~else-sym (fn delay-else [] ~else-expr)]
+       ~(reduce
+         (fn [core clause]
+           ;; fully-qualify if-let in case we decide to rename this macro
+           ;; to if-let in the future.
+           `(clojure.core/if-let [~@clause] ~core (~else-sym)))
+         then-expr
+         (reverse (partition 2 bindings))))))
+
 ;;;; Comparisons
 
 (defn ^{:since "1.0.0"} lexicomp
