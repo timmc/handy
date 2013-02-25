@@ -1,9 +1,11 @@
 (ns org.timmc.handy
-  "Main utility namespace.")
+  "Main utility namespace.
+
+All vars marked with :since metadata form the public API.")
 
 ;;;; Control flow
 
-(defmacro if-let+
+(defmacro ^{:since "1.4.0"} if-let+
   "Like if-let, but with multiple bindings. If any binding evaluates to
 false or nil, the else expression is evaluated and returned, and the
 remaining bindings are not evaluated. The else-expression cannot use any
@@ -132,7 +134,7 @@ Recommended for use in combination with with-redefs."
 
 ;;;; Calculations
 
-(defn paging
+(defn ^{:since "1.4.0"} paging
   "Derive paging information from a record count and requested page index.
 
 Input:

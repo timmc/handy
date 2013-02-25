@@ -6,11 +6,11 @@ Just some handy utilities. The API is any public function not marked ^:internal.
 
 If you use Leiningen, add the following to your project.clj dependencies:
 
-`[org.timmc/handy "1.3.0"]`
+`[org.timmc/handy "1.4.0"]`
 
 The main namespace is `org.timmc.handy`.
 
-Compatible with Clojure 1.2.0 through 1.4.0.
+Compatible with Clojure 1.2.0 through 1.5.0-RC17.
 
 ## Building
 
@@ -34,6 +34,10 @@ Built with Leiningen 2, but should be buildable with 1.x as well.
 ### v1.3.0
 * Add `split-atom!` and `deterministic`
 * Tested up to Clojure 1.5.0-RC2
+
+### v1.4.0
+* Add `if-let+` and `paging`
+* Tested up to Clojure 1.5.0-RC17
 
 ## License
 
