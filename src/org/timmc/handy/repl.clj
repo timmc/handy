@@ -11,7 +11,8 @@
   [m]
   (if (:static? m) "st" "  "))
 
-(def ^:dynamic *fq* "True for fully-qualified classnames in output."
+(def ^:dynamic ^{:doc "True for fully-qualified classnames in output."}
+  *fq*
   false)
 
 (defn ^:internal format-classname
