@@ -50,7 +50,7 @@
   [ms]
   (sort-by (comp not :static?) (sort-by :name ms)))
 
-(defn show
+(defn ^{:added "1.5.0"} show
   "Print the methods, constructors, and fields of the class of the provided
 value (or the class itself, if a Class subclass is provided.) Options are
 entered in an optional map, with allowed values:

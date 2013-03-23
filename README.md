@@ -8,7 +8,7 @@ Generally, this covers any public var not marked :internal.
 
 If you use Leiningen, add the following to your project.clj dependencies:
 
-`[org.timmc/handy "1.4.0"]`
+`[org.timmc/handy "1.5.0"]`
 
 The main namespace is `org.timmc.handy`.
 
@@ -40,6 +40,13 @@ Built with Leiningen 2, but should be buildable with 1.x as well.
 ### v1.4.0
 * Add `if-let+` and `paging`
 * Tested up to Clojure 1.5.0-RC17
+
+### v1.5.0
+* Added REPL utilities namespace, org.timmc.handy.repl:
+** `show` replaces the old contrib repl fn of the same name, printing
+   the structure of a JVM class.
+* Added reflection namespace, org.timmc.handy.reflect
+* Renamed :since metadata to :added (match clojure.core convention)
 
 ## License
 

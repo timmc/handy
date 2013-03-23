@@ -12,7 +12,7 @@ enabled."
   [to-check threshold]
   (apply >= (map vis-levels [to-check threshold])))
 
-(defn visibility
+(defn ^{:added "1.5.0"} visibility
   "Return Member visibility as :public, :protected, :package, or :private."
   [^Member m]
   (let [mod (.getModifiers m)]
@@ -48,7 +48,7 @@ and all of its ancestors, then remove shadowed members."
           (mapcat #(f % (dissoc opts :ancestors))
                   (cons c (ancestors c)))))
 
-(defn fields
+(defn ^{:added "1.5.0"} fields
   "Return fields as maps of {:type :field, :name String, :return Class,
 :visibility? kw, :static? bool, :owner Class, :synthetic? bool}"
   ([^Class c, opts]
@@ -61,7 +61,7 @@ and all of its ancestors, then remove shadowed members."
             :owner (.getDeclaringClass m), :synthetic? (.isSynthetic m)}))))
   ([^Class c] (fields c {})))
 
-(defn constructors
+(defn ^{:added "1.5.0"} constructors
   "Return constructors as maps of {:type :constructor, :params [Class...],
 :varargs? bool, :visibility? kw, :owner c, :synthetic? bool}."
   ([^Class c, opts]
@@ -75,7 +75,7 @@ and all of its ancestors, then remove shadowed members."
             :owner (.getDeclaringClass m), :synthetic? (.isSynthetic m)}))))
   ([^Class c] (constructors c {})))
 
-(defn methods
+(defn ^{:added "1.5.0"} methods
   "Return methods as maps of {:type :method, :name String, :return Class,
 :params [Class...], :varargs? bool, :abstract? bool, :visibility? kw,
 :static? bool, :owner c, :synthetic? bool}."
