@@ -1,11 +1,9 @@
 (ns org.timmc.handy
-  "Main utility namespace.
-
-All vars marked with :since metadata form the public API.")
+  "Main utility namespace: A grab-bag of handy things.")
 
 ;;;; Control flow
 
-(defmacro ^{:since "1.4.0"} if-let+
+(defmacro ^{:added "1.4.0"} if-let+
   "Like if-let, but with multiple bindings. If any binding evaluates to
 false or nil, the else expression is evaluated and returned, and the
 remaining bindings are not evaluated. The else-expression cannot use any
@@ -27,7 +25,7 @@ of the bindings, and the then-expression may use all of them."
 
 ;;;; Comparisons
 
-(defn ^{:since "1.0.0"} lexicomp
+(defn ^{:added "1.0.0"} lexicomp
   "Compare two sequential collections lexicographically, returning a
 positive integer if the first argument is greater than the other
 argument, as in Java's Comparable. (Negative for other order, zero for equal.)
@@ -48,7 +46,7 @@ do as little computation as possible.)"
             (recur (next main) (next other))
             cmp))))))
 
-(defn ^{:since "1.0.0"} version-norm
+(defn ^{:added "1.0.0"} version-norm
   "Convert a simple version into a sequential coll of integers with no
 trailing zero elements. For example, \"2.21.6.0.0\" => [2 21 6]. A version
 string is a dot-separated series of one or more integers."
@@ -62,7 +60,7 @@ string is a dot-separated series of one or more integers."
        (drop-while zero?)
        reverse))
 
-(defn ^{:since "1.0.0"} version<=
+(defn ^{:added "1.0.0"} version<=
   "Check that the versions are in monotonically increasing order (does not
 require strictly ascending.) Versions are strings of 1 or more dot-delimited
 integers. Trailing zeros will be ignored, as with 'version-norm. Returns
@@ -74,7 +72,7 @@ logical true/false."
 
 ;;;; Sandboxing
 
-(defmacro ^{:since "1.1.0"} with-temp-ns
+(defmacro ^{:added "1.1.0"} with-temp-ns
   "Run some code in a namespace sandbox."
   [[& ns-modifiers] & exprs]
   (let [old-ns (.name *ns*)
@@ -94,7 +92,7 @@ logical true/false."
 
 ;;;; Structural manipulation
 
-(defn ^{:since "1.2.0"} index-on
+(defn ^{:added "1.2.0"} index-on
   "From a table (coll of record maps) produce a map of index key values
 to projections on the other keys. r->k is a function of a record to some
 key value, e.g. #(get % 5) or (juxt :a :b) or just :c.
@@ -107,7 +105,7 @@ Example: (index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}] :a [:b])
 
 ;;;; Mutation
 
-(defn ^{:since "1.3.0"} split-atom!
+(defn ^{:added "1.3.0"} split-atom!
   "Swap an atom with the `keep` function and produce the corresponding
 result of applying `return` to the old value. Thread-safe.
 
@@ -122,7 +120,7 @@ but also return the value."
 
 ;;;; Testing
 
-(defn ^{:since "1.3.0"} deterministic
+(defn ^{:added "1.3.0"} deterministic
   "Return a function that will return each of the given values in
 sequence when called multiple times. Behavior unspecified if called
 more times than there are values.
@@ -134,7 +132,7 @@ Recommended for use in combination with with-redefs."
 
 ;;;; Calculations
 
-(defn ^{:since "1.4.0"} paging
+(defn ^{:added "1.4.0"} paging
   "Derive paging information from a record count and requested page index.
 
 Input:

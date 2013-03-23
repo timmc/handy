@@ -1,6 +1,8 @@
 # org.timmc/handy
 
-Just some handy utilities. The API is any public function not marked ^:internal.
+Just some handy utilities. The API is any var with :added metadata,
+indicating the version of handy in which the var was introduced.
+Generally, this covers any public var not marked :internal.
 
 ## Usage
 
