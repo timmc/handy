@@ -3,7 +3,7 @@
         org.timmc.handy.repl))
 
 (deftest formatting
-  (are [c fq? s] (binding [*fq* fq?]
+  (are [c fq? s] (binding [*show-fq* fq?]
                    (= (format-classname c) s))
        String false "String"
        String true "java.lang.String"

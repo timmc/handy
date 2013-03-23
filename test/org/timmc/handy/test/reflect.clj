@@ -10,6 +10,23 @@
   (is (vis>= :public :package))
   (is (not (vis>= :private :protected))))
 
+(deftest deduplication
+  (let [subject (partial dedupe first #(> (second %) (second %2)))]
+    (testing "base cases"
+      (is (= (subject [])
+             []))
+      (is (= (subject [[:a 1]])
+             [[:a 1]])))
+    (testing "order-independence in 2-element case (regression check)"
+      (is (= (subject [[:a 3] [:a 1]])
+             [[:a 3]]))
+      (is (= (subject [[:a 1] [:a 3]])
+             [[:a 3]])))
+    (testing "mixed order, with full-duplicate checking"
+      (is (= (sort-by first compare
+                      (subject [[:a 1] [:b 20 3] [:a 5] [:b 20 1] [:a 0]]))
+             [[:a 5] [:b 20 3]])))))
+
 (deftest field
   (is (= (first (filter (comp #{"SIZE"} :name) (fields Long)))
          {:type :field, :name "SIZE", :return Integer/TYPE,

@@ -1,4 +1,5 @@
 (ns org.timmc.handy.repl
+  "REPL utilities."
   (:require [clojure.string :as str]
             [org.timmc.handy.reflect :as rf]
             [clojure.set :as set]))
@@ -11,13 +12,14 @@
   [m]
   (if (:static? m) "st" "  "))
 
-(def ^:dynamic ^{:doc "True for fully-qualified classnames in output."}
-  *fq*
+(def ^:dynamic ^:internal
+  ^{:doc "True for fully-qualified classnames in output."}
+  *show-fq*
   false)
 
 (defn ^:internal format-classname
   [cls]
-  (if *fq*
+  (if *show-fq*
     (if (.isPrimitive cls)
       (.getSimpleName cls)
       (if (.isArray cls)
@@ -25,7 +27,7 @@
         (.getName cls)))
     (.getSimpleName cls)))
 
-(defmulti write-member :type)
+(defmulti ^:internal write-member :type)
 (defmethod write-member :field [f]
   (format " %s %s %s : %s"
           (vis-str (:visibility f))
@@ -69,7 +71,7 @@ entered in an optional map, with allowed values:
            members {:Fields (rf/fields cl rf-opts)
                     :Constructors (rf/constructors cl rf-opts)
                     :Methods (rf/methods cl rf-opts)}]
-       (binding [*fq* fq]
+       (binding [*show-fq* fq]
          (println (format-classname cl))
          (println "Bases:" (map format-classname (bases cl)))
          (doseq [t [:Fields :Constructors :Methods]]

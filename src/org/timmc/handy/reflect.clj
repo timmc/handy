@@ -2,12 +2,13 @@
   "Synthetic members are omitted unless the :show-synthetic option is
 enabled. Inherited members are omitted unless the :ancestors option is
 enabled."
+  (:require [org.timmc.handy :as core])
   (:import (java.lang.reflect Member Field Method Constructor Modifier))
   (:refer-clojure :exclude (methods)))
 
 (def ^:private vis-levels {:public 3 :protected 2 :package 1 :private 0})
 
-(defn vis>=
+(defn ^:internal vis>=
   [to-check threshold]
   (apply >= (map vis-levels [to-check threshold])))
 
@@ -20,16 +21,19 @@ enabled."
           (Modifier/isPrivate mod) :private
           :else :package)))
 
-(defn dedupe
-  "Given zero or more values, remove duplicates. keyf maps values to keys (in
+;; Internal because it needs work.
+(defn ^:internal dedupe
+  "Given zero or more values, remove duplicates. keyfn maps values to keys (in
 the DB sense) -- matching return values mean the inputs are duplicates.
 beats? [a b -> bool] resolves the conflicts -- a logical-true return
 indicates that a is preferred in deduplication with b."
-  [keyf beats? & vs]
-  (for [[_ conflict] (group-by keyf vs)]
+  [keyfn beats? vs]
+  (for [[_ conflict] (group-by keyfn vs)]
     (if (= (count conflict) 1)
       (first conflict)
-      (reduce #(if (beats? %1 %2) %1 %2) (first conflict) (rest conflict)))))
+      ;; Using beats? this way prefers the first element in the case of
+      ;; values that are duplicates according to both keyfn and beats?.
+      (reduce #(if (beats? %2 %1) %2 %1) conflict))))
 
 ;; If I ever try to add functionality to indicate whether a method
 ;; overrides another method, make sure to take into account bridge
@@ -39,11 +43,10 @@ indicates that a is preferred in deduplication with b."
   "Run the members function f (with given options map opts) against c
 and all of its ancestors, then remove shadowed members."
   [f c opts]
-  (apply dedupe
-         (juxt :type :name :params)
-         #(isa? (:owner %1) (:owner %2))
-         (mapcat #(f % (dissoc opts :ancestors))
-                 (cons c (ancestors c)))))
+  (dedupe (juxt :type :name :params)
+          #(isa? (:owner %1) (:owner %2))
+          (mapcat #(f % (dissoc opts :ancestors))
+                  (cons c (ancestors c)))))
 
 (defn fields
   "Return fields as maps of {:type :field, :name String, :return Class,
