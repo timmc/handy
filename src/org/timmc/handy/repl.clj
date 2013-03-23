@@ -36,12 +36,12 @@
           (vis-str (:visibility c))
           (str/join ", " (map format-classname (:params c)))))
 (defmethod write-member :method [m]
-  (format " %s %s %s : %s : %s"
+  (format " %s %s %s : %s -> %s"
           (vis-str (:visibility m))
           (static-str m)
           (:name m)
-          (format-classname (:return m))
-          (str/join ", " (map format-classname (:params m)))))
+          (str/join ", " (map format-classname (:params m)))
+          (format-classname (:return m))))
 
 (defn- sort-members
   [ms]
