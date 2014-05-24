@@ -1,8 +1,11 @@
+# lein
 /pom.xml
 /*.jar
-/lib
-/classes
-/native
 /.lein-*
 /checkouts
 /target/
+
+# older lein
+/lib
+/classes
+/native
