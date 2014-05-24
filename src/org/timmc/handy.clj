@@ -72,6 +72,7 @@ logical true/false."
 
 ;;;; Reflection
 
+;; Inspired by https://github.com/technomancy/leiningen/blob/5e26a1639f0bc0a7efdc078f1a5011af92b2cd70/leiningen-core/src/leiningen/core/main.clj#L226 viewed 2014-05-08
 (defn ^{:added "1.6.0"} matching-arity
   "Given a collection of arglists (or a var or a var's metadata) and
 an arity count to test aginst, yield smallest matching arglist or
