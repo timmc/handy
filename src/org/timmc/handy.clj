@@ -70,6 +70,26 @@ logical true/false."
   (let [vs (map version-norm (cons v more))]
     (every? (complement pos?) (map lexicomp vs (next vs)))))
 
+;;;; Reflection
+
+(defn matching-arity
+  "Given a collection of arglists (or a var or a var's metadata) and
+an arity count to test aginst, yield smallest matching arglist or
+nil." ;; TODO Accept actual arglist, check types?
+  [arglist-source arity]
+  ;; I'm sure there's some horribly fun use of function composition I
+  ;; could do here, building up a list of unwrappers... but I won't do
+  ;; it, because I'm nice.
+  (let [arglists (cond (var? arglist-source) (:arglists (meta arglist-source))
+                       (map? arglist-source) (:arglists arglist-source)
+                       :else                 arglist-source)]
+    (first (filter (fn [arglist]
+                     (if (= '& (last (butlast arglist)))
+                       (<= (- (count arglist) 2) arity)
+                       (= (count arglist) arity)))
+                   ;; Get [a b] before [a b & c]
+                   (sort arglists)))))
+
 ;;;; Sandboxing
 
 (defmacro ^{:added "1.1.0"} with-temp-ns

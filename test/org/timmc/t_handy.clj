@@ -88,6 +88,40 @@
        ["0.0.9" "0.1"] true ;; no zero-stripping on front
        ["1.7" "18"] true)) ;; no splitting of multi-digit segments
 
+;;;; Reflection
+
+(defn out-of-order
+  "Example function for tests."
+  ([] 0)
+  ([a b & c] :abc) ;; Intentionally *before* binary case to test minimality
+  ([a b] :ab))
+
+(defn only-n-ary
+  [& c]
+  :n)
+
+(deftest arity-matching
+  (testing "out-of-order example function"
+    (is (= (matching-arity #'out-of-order 0) []))
+    (is (= (matching-arity #'out-of-order 1) nil))
+    (testing "Prefer binary case to n-ary case"
+      (is (= (matching-arity #'out-of-order 2) '[a b])))
+    (is (= (matching-arity #'out-of-order 3) '[a b & c]))
+    (is (= (matching-arity #'out-of-order 500) '[a b & c])))
+  (testing "only-n-ary example function"
+    (is (= (matching-arity #'only-n-ary 0) '[& c]))
+    (is (= (matching-arity #'only-n-ary 1) '[& c]))
+    (is (= (matching-arity #'only-n-ary 500) '[& c])))
+  (testing "can use bare arglist coll"
+    (is (= (matching-arity '[[] [a b & c] [a b]] 2)
+           '[a b]))
+    (testing "including if reversed"
+      (is (= (matching-arity '[[] [a b] [a b & c]] 2)
+             '[a b]))))
+  (testing "can use var meta"
+    (is (= (matching-arity {:arglists '[[] [a b & c] [a b]]} 2)
+           '[a b]))))
+
 ;;;; Sandboxing
 
 (def test-a 8)
