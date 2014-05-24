@@ -53,6 +53,6 @@ Test against all supported Clojure versions with `lein all-clj test`.
 
 ## License
 
-Copyright (C) 2012–2013 Tim McCormack
+Copyright (C) 2012–2014 Tim McCormack
 
 Distributed under the Eclipse Public License, the same as Clojure.
