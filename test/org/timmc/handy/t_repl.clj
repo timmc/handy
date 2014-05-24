@@ -1,4 +1,4 @@
-(ns org.timmc.handy.test.repl
+(ns org.timmc.handy.t-repl
   (:use clojure.test
         org.timmc.handy.repl))
 

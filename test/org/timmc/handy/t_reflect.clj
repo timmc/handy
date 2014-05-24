@@ -1,4 +1,4 @@
-(ns org.timmc.handy.test.reflect
+(ns org.timmc.handy.t-reflect
   (:use clojure.test
         org.timmc.handy.reflect)
   (:refer-clojure :exclude (methods)))

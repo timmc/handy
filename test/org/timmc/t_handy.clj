@@ -1,6 +1,6 @@
-(ns org.timmc.test.handy
-  (:use [org.timmc.handy])
-  (:use [clojure.test]))
+(ns org.timmc.t-handy
+  (:use clojure.test
+        org.timmc.handy))
 
 ;;;; testing
 
@@ -134,8 +134,8 @@
 
 (deftest compile-sequential-ns
   (is (= (with-temp-ns [(import 'java.awt.Shape)
-                        (require 'org.timmc.test.handy)
-                        (def a (org.timmc.test.handy/resolver Shape))]
+                        (require 'org.timmc.t-handy)
+                        (def a (org.timmc.t-handy/resolver Shape))]
            (+ 2 3))
          5)))
 
