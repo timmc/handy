@@ -12,11 +12,13 @@ If you use Leiningen, add the following to your project.clj dependencies:
 
 The main namespace is `org.timmc.handy`.
 
-Compatible with Clojure 1.2.0 through 1.5.1.
+Compatible with Clojure 1.2.0 through 1.6.0.
 
 ## Building
 
 Built with Leiningen 2, but should be buildable with 1.x as well.
+
+Test against all supported Clojure versions with `lein all-clj test`.
 
 ## Changelog
 
@@ -43,10 +45,11 @@ Built with Leiningen 2, but should be buildable with 1.x as well.
 
 ### v1.5.0
 * Added REPL utilities namespace, org.timmc.handy.repl:
-** `show` replaces the old contrib repl fn of the same name, printing
-   the structure of a JVM class.
+    * `show` replaces the old contrib repl fn of the same name,
+      printing the structure of a JVM class
 * Added reflection namespace, org.timmc.handy.reflect
 * Renamed :since metadata to :added (match clojure.core convention)
+* Tested up to Clojure 1.6.0
 
 ## License
 
