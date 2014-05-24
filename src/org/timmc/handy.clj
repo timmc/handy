@@ -72,7 +72,7 @@ logical true/false."
 
 ;;;; Reflection
 
-(defn matching-arity
+(defn ^{:added "1.6.0"} matching-arity
   "Given a collection of arglists (or a var or a var's metadata) and
 an arity count to test aginst, yield smallest matching arglist or
 nil." ;; TODO Accept actual arglist, check types?
