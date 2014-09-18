@@ -131,7 +131,10 @@ Example: (index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}] :a [:b])
 result of applying `return` to the old value. Thread-safe.
 
 This is useful if you want to remove a value from a collection in an atom
-but also return the value."
+but also return the value.
+
+If `return` throws, the atom is left unchanged (and the exception
+propagates.)"
   [a return keep]
   (let [r (atom nil)]
     (swap! a (fn splitter [old]

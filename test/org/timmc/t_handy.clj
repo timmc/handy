@@ -184,7 +184,15 @@
 (deftest splitting
   (let [a (atom (range 10))]
     (is (= (split-atom! a first rest) 0))
-    (is (= @a (range 1 10)))))
+    (is (= @a (range 1 10))))
+  (testing "Error in keep does not alter atom"
+    (let [a (atom (range 10))]
+      (is (thrown? Exception (split-atom! a first inc)))
+      (is (= @a (range 10)))))
+  (testing "Error in return does not alter atom"
+    (let [a (atom (range 10))]
+      (is (thrown? Exception (split-atom! a inc rest)))
+      (is (= @a (range 10))))))
 
 ;;;; Testing
 
