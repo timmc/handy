@@ -201,6 +201,20 @@
     (is (= (map f [:a :b :c :d]) (range 0 4)))
     (is (= (f 'various 'things) 4))))
 
+(deftest tabular
+  (let [[call, t1 t2, desc-bind k-bind n-bind, & variations]
+        (macroexpand-1
+                (list `tabular-delta
+                      'test-1
+                      'test-2
+                      (sorted-map '?k :a '?n 1)
+                      (sorted-map "baseline" {} "k-b" {'?k :b} "n-2" {'?n 2})))]
+    (is (= [call t1 t2] '[midje.sweet/tabular test-1 test-2]))
+    (is (and (symbol? desc-bind)
+             (.startsWith (name desc-bind) "?description_")))
+    (is (= [k-bind n-bind] '[?k ?n]))
+    (is (= variations ["baseline" :a 1 "k-b" :b 1 "n-2" :a 2]))))
+
 ;;;; Calculations
 
 (deftest pagination

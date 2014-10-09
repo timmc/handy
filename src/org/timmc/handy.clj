@@ -1,5 +1,6 @@
 (ns org.timmc.handy
-  "Main utility namespace: A grab-bag of handy things.")
+  "Main utility namespace: A grab-bag of handy things."
+  (:require [clojure.set :as set]))
 
 ;;;; Control flow
 
@@ -153,6 +154,68 @@ Recommended for use in combination with with-redefs."
   [& returns]
   (let [remaining (atom returns)]
     (fn determined [& _] (split-atom! remaining first rest))))
+
+(defmacro ^{:added "1.7.0"} tabular-delta
+  "Create a midje tabular form, but support cases that only differ as
+specified from a set of default bindings. Instead of a row of binding
+symbols, tabular-delta accepts a map of binding symbols to default
+values. Instead of rows of test value sets, tabular-delta accepts a
+map of strings (test descriptions) to maps of bindings symbols to
+override values (a subset of the binding keys.)
+
+Many tests will take the form of a succeeding test (a baseline) and
+then a series of tweaks that make it fail in different ways. Here's
+how you'd express that with tabular-delta:
+
+    (tabular-delta
+     ;; Fact metadata and tests
+     (= (+ ?a ?b) ?c) => ?checker
+     ;; Bindings and defaults
+     {?a 2, ?b 3, ?c 5, ?checker truthy}
+     ;; Cases that vary the bindings
+     {\"baseline\" {}
+      \"over\" {?a 100, ?checker FALSEY}
+      \"not even a number\" {?c :parrot, ?checker FALSEY}})
+
+This reduces redundancy in tests, which has two benefits: 1) tests are
+easier to read, and 2) you can have more confidence that you are
+actually testing what you think you are testing.
+
+Assumes that namespace midje.sweet has already been require'd (but not
+necessarily refer'd."
+  [& forms]
+  (let [body (drop-last 2 forms)
+        [default-binds cases] (take-last 2 forms)]
+    (when (empty? body)
+      (throw (IllegalArgumentException. "Must have at least one fact.")))
+    (when-not (map? default-binds)
+      (throw (IllegalArgumentException. "Default bindings must be a map.")))
+    (when-not (map? cases)
+      (throw (IllegalArgumentException. "Cases must be a map.")))
+    (let [allowed-keys (keys default-binds)
+          pull-vals (apply juxt (map (fn [sym] #(get % sym)) allowed-keys))]
+      (when-let [bad (seq (remove #(.startsWith (name %) "?") allowed-keys))]
+        (throw (RuntimeException.
+                (str "Bad binding keys, must be of form `?symbol`: " bad))))
+      (doseq [[case-name case-map] cases]
+        (when-not (string? case-name)
+          (throw (RuntimeException.
+                  (str "Case name must be a string, was: " case-name))))
+        (when-let [bad (seq (set/difference (set (keys case-map))
+                                            (set allowed-keys)))]
+          (throw (RuntimeException.
+                  (format "Case has keys outside of the defaults. %s: %s"
+                          case-name bad)))))
+      (let [desc-sym (gensym "?description_")
+            case-vals (for [[case-name case-map] cases
+                            val (cons
+                                 case-name
+                                 (pull-vals (merge default-binds case-map)))]
+                        val)]
+        `(midje.sweet/tabular
+          ~@body
+          ~desc-sym ~@(map (comp symbol name) allowed-keys)
+          ~@case-vals)))))
 
 ;;;; Calculations
 

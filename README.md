@@ -54,6 +54,9 @@ Test against all supported Clojure versions with `lein all-clj test`.
 ### v1.6.0
 * Add `matching-arity` to check if a var is callable
 
+## v.1.7.0
+* Add `tabular-delta` to help with vary-one-thing midje tests
+
 ## License
 
 Copyright (C) 2012–2014 Tim McCormack
