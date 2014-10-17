@@ -8,7 +8,7 @@ Generally, this covers any public var not marked :internal.
 
 If you use Leiningen, add the following to your project.clj dependencies:
 
-`[org.timmc/handy "1.6.0"]`
+`[org.timmc/handy "1.7.0"]`
 
 The main namespace is `org.timmc.handy`.
 
@@ -54,8 +54,11 @@ Test against all supported Clojure versions with `lein all-clj test`.
 ### v1.6.0
 * Add `matching-arity` to check if a var is callable
 
-## v.1.7.0
+### v.1.7.0
 * Add `tabular-delta` to help with vary-one-thing midje tests
+
+### v.next
+- ?
 
 ## License
 
