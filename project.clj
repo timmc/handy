@@ -1,4 +1,4 @@
-(defproject org.timmc/handy "1.7.0"
+(defproject org.timmc/handy "1.7.1-SNAPSHOT"
   :description "Common utilities to fill in the gaps"
   :url "https://github.com/timmc/handy"
   :license {:name "Eclipse Public License - v1.0"
