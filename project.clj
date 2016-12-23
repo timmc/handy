@@ -21,6 +21,7 @@
              :1.8.0 {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :dev {:plugins [[lein-release "1.0.5"]]}}
   :aliases {"all-clj" ["with-profile" "+1.2.0:+1.2.1:+1.3.0:+1.4.0:+1.5.0:+1.5.1:+1.6.0:+1.7.0:+1.8.0"]}
+  :global-vars {*warn-on-reflection* true}
   :lein-release {:scm :git
                  :deploy-via :shell
                  :shell ["lein" "deploy" "clojars"]})

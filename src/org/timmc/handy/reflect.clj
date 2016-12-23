@@ -54,7 +54,7 @@ and all of its ancestors, then remove shadowed members."
   ([^Class c, opts]
      (if (:ancestors opts)
        (recurse-members fields c opts)
-       (for [m (.getDeclaredFields c)]
+       (for [^Field m (.getDeclaredFields c)]
          (let [mod (.getModifiers m)]
            {:type :field, :name (.getName m), :visibility (visibility m),
             :static? (Modifier/isStatic mod), :return (.getType m),
@@ -67,7 +67,7 @@ and all of its ancestors, then remove shadowed members."
   ([^Class c, opts]
      (if (:ancestors opts)
        (recurse-members constructors c opts)
-       (for [m (.getDeclaredConstructors c)
+       (for [^Constructor m (.getDeclaredConstructors c)
              :when (or (not (.isSynthetic m)) (:show-synthetic opts))]
          (let [mod (.getModifiers m)]
            {:type :constructor, :params (vec (.getParameterTypes m)),
@@ -82,7 +82,7 @@ and all of its ancestors, then remove shadowed members."
   ([^Class c, opts]
      (if (:ancestors opts)
        (recurse-members methods c opts)
-       (for [m (.getDeclaredMethods c)
+       (for [^Method m (.getDeclaredMethods c)
              :when (or (not (.isSynthetic m)) (:show-synthetic opts))]
          (let [mod (.getModifiers m)]
            {:type :method, :name (.getName m), :return (.getReturnType m),

@@ -2,6 +2,7 @@
 
 ## Unreleased
 - Confirmed Clojure 1.7.0, 1.8.0 support
+- Remove reflection warnings
 
 ## 1.7.0 - 2014-10-17
 - Add `tabular-delta` to help with vary-one-thing midje tests

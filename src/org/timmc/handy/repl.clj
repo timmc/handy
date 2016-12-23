@@ -18,7 +18,7 @@
   false)
 
 (defn ^:internal format-classname
-  [cls]
+  [^Class cls]
   (if *show-fq*
     (if (.isPrimitive cls)
       (.getSimpleName cls)
