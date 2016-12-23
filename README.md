@@ -12,7 +12,7 @@ If you use Leiningen, add the following to your project.clj dependencies:
 
 The main namespace is `org.timmc.handy`.
 
-Compatible with Clojure 1.2.0 through 1.6.0.
+Compatible with Clojure 1.2.0 through 1.8.0.
 
 ## Building
 

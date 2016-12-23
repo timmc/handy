@@ -4,7 +4,7 @@ enabled. Inherited members are omitted unless the :ancestors option is
 enabled."
   (:require [org.timmc.handy :as core])
   (:import (java.lang.reflect Member Field Method Constructor Modifier))
-  (:refer-clojure :exclude (methods)))
+  (:refer-clojure :exclude (dedupe methods)))
 
 (def ^:private vis-levels {:public 3 :protected 2 :package 1 :private 0})
 

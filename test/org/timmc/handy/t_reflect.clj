@@ -1,7 +1,7 @@
 (ns org.timmc.handy.t-reflect
   (:use clojure.test
         org.timmc.handy.reflect)
-  (:refer-clojure :exclude (methods)))
+  (:refer-clojure :exclude (methods dedupe)))
 
 (deftest vis
   (is (= (visibility (.getMethod String "equals" (into-array Class [Object])))
