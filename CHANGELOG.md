@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- 
+
+## 1.7.1 - 2016-12-23
 - Confirmed Clojure 1.7.0, 1.8.0 support
 - Remove reflection warnings
 
