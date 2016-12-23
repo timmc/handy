@@ -1,17 +1,16 @@
 (ns org.timmc.handy.t-reflect
-  (:use clojure.test
-        org.timmc.handy.reflect)
-  (:refer-clojure :exclude (methods dedupe)))
+  (:require [org.timmc.handy.reflect :as r])
+  (:use clojure.test))
 
 (deftest vis
-  (is (= (visibility (.getMethod String "equals" (into-array Class [Object])))
+  (is (= (r/visibility (.getMethod String "equals" (into-array Class [Object])))
          :public))
-  (is (vis>= :public :public))
-  (is (vis>= :public :package))
-  (is (not (vis>= :private :protected))))
+  (is (r/vis>= :public :public))
+  (is (r/vis>= :public :package))
+  (is (not (r/vis>= :private :protected))))
 
 (deftest deduplication
-  (let [subject (partial dedupe first #(> (second %) (second %2)))]
+  (let [subject (partial r/dedupe first #(> (second %) (second %2)))]
     (testing "base cases"
       (is (= (subject [])
              []))
@@ -28,17 +27,17 @@
              [[:a 5] [:b 20 3]])))))
 
 (deftest field
-  (is (= (first (filter (comp #{"SIZE"} :name) (fields Long)))
+  (is (= (first (filter (comp #{"SIZE"} :name) (r/fields Long)))
          {:type :field, :name "SIZE", :return Integer/TYPE,
           :visibility :public, :static? true, :synthetic? false, :owner Long})))
 
 (deftest constr
-  (is (= (first (constructors Enum))
+  (is (= (first (r/constructors Enum))
          {:type :constructor, :visibility :protected, :varargs? false,
           :params [String Integer/TYPE], :synthetic? false, :owner Enum})))
 
 (deftest meth
-  (is (= (first (filter (comp #{"equalsIgnoreCase"} :name) (methods String)))
+  (is (= (first (filter (comp #{"equalsIgnoreCase"} :name) (r/methods String)))
          {:type :method, :name "equalsIgnoreCase", :return Boolean/TYPE,
           :visibility :public, :abstract? false, :params [String],
           :varargs? false, :static? false, :synthetic? false, :owner String})))
@@ -51,6 +50,6 @@
                           (f example {:ancestors true})))
                 (set (map signature
                           (mapcat f (cons example (ancestors example))))))
-         fields
-         constructors
-         methods)))
+         r/fields
+         r/constructors
+         r/methods)))

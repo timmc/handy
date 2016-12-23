@@ -1,10 +1,10 @@
 (ns org.timmc.handy.t-repl
-  (:use clojure.test
-        org.timmc.handy.repl))
+  (:require [org.timmc.handy.repl :as r])
+  (:use clojure.test))
 
 (deftest formatting
-  (are [c fq? s] (binding [*show-fq* fq?]
-                   (= (format-classname c) s))
+  (are [c fq? s] (binding [r/*show-fq* fq?]
+                   (= (r/format-classname c) s))
        String false "String"
        String true "java.lang.String"
        Integer/TYPE false "int"

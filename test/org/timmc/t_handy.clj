@@ -1,6 +1,6 @@
 (ns org.timmc.t-handy
-  (:use clojure.test
-        org.timmc.handy))
+  (:require [org.timmc.handy :as h])
+  (:use clojure.test))
 
 ;;;; testing
 
@@ -25,40 +25,40 @@
 (deftest multi-clause
   (testing "no execution of else-expr if then-expr is invoked"
     (let [mutation (atom 0)]
-      (is (= (if-let+ [[a b] (range 5 10)
-                       c (+ a b)]
-                      c
-                      (swap! mutation inc))
+      (is (= (h/if-let+ [[a b] (range 5 10)
+                         c (+ a b)]
+                        c
+                        (swap! mutation inc))
              11))
       (is (zero? @mutation))))
   (testing "no execution of then-expr if else-expr is invoked"
     (let [mutation (atom 0)]
-      (is (= (if-let+ [[a b] (range 5 10)
-                       c (= a b)]
-                      (swap! mutation inc)
-                      :else-clause)
+      (is (= (h/if-let+ [[a b] (range 5 10)
+                         c (= a b)]
+                        (swap! mutation inc)
+                        :else-clause)
              :else-clause))
       (is (zero? @mutation))))
   (testing "short-circuiting of bindings"
     (let [mutation (atom [])]
-      (is (= (if-let+ [[a b] (range 5 10)
-                       c (= a b)
-                       d (swap! mutation conj :d)]
-                      (swap! mutation conj :then)
-                      (do (swap! mutation conj :else)
-                          :else-clause))
+      (is (= (h/if-let+ [[a b] (range 5 10)
+                         c (= a b)
+                         d (swap! mutation conj :d)]
+                        (swap! mutation conj :then)
+                        (do (swap! mutation conj :else)
+                            :else-clause))
              :else-clause))
       (is (= @mutation [:else]))))
   (testing "degenerate case"
-    (is (= (if-let+ [] 4 5) 4)))
+    (is (= (h/if-let+ [] 4 5) 4)))
   (testing "no throwing things away"
     (is (thrown-with-msg? Exception #"bindings.*even"
-          (macroexpand-1 '(if-let+ [one] 2 3))))))
+                          (macroexpand-1 '(h/if-let+ [one] 2 3))))))
 
 ;;;; Comparisons
 
 (deftest lexicographic
-  (are [main other out] (= (sign (lexicomp main other))
+  (are [main other out] (= (sign (h/lexicomp main other))
                            (sign out))
        [] nil 0 ;; equality of nil and []
        nil [1 2] -1 ;; nil is low
@@ -70,16 +70,16 @@
        (range 5) [0 1 2 3] 1 ;; seqs against vectors
        () [] 0) ;; and lists
   ;; no non-sequential types
-  (is (thrown? AssertionError (lexicomp {} [])))
-  (is (thrown? AssertionError (lexicomp #{} []))))
+  (is (thrown? AssertionError (h/lexicomp {} [])))
+  (is (thrown? AssertionError (h/lexicomp #{} []))))
 
 (deftest versions
-  (is (sequential? (version-norm "5.6")))
-  (are [a e] (= (version-norm a) e)
+  (is (sequential? (h/version-norm "5.6")))
+  (are [a e] (= (h/version-norm a) e)
        "0" []
        "0.3.0.5.0.0" [0 3 0 5]
        "67.1.12" [67 1 12]) ;; no splitting of multi-digit segments
-  (are [vs b] (= (boolean (apply version<= vs)) b)
+  (are [vs b] (= (boolean (apply h/version<= vs)) b)
        ["1"] true ;; single element always true
        ["0" "1" "1" "2"] true ;; need not be strictly increasing
        ["1" "5" "0"] false ;; basic falsehood check
@@ -97,29 +97,30 @@
   ([a b] :ab))
 
 (defn only-n-ary
+  "Another example function."
   [& c]
   :n)
 
 (deftest arity-matching
   (testing "out-of-order example function"
-    (is (= (matching-arity #'out-of-order 0) []))
-    (is (= (matching-arity #'out-of-order 1) nil))
+    (is (= (h/matching-arity #'out-of-order 0) []))
+    (is (= (h/matching-arity #'out-of-order 1) nil))
     (testing "Prefer binary case to n-ary case"
-      (is (= (matching-arity #'out-of-order 2) '[a b])))
-    (is (= (matching-arity #'out-of-order 3) '[a b & c]))
-    (is (= (matching-arity #'out-of-order 500) '[a b & c])))
+      (is (= (h/matching-arity #'out-of-order 2) '[a b])))
+    (is (= (h/matching-arity #'out-of-order 3) '[a b & c]))
+    (is (= (h/matching-arity #'out-of-order 500) '[a b & c])))
   (testing "only-n-ary example function"
-    (is (= (matching-arity #'only-n-ary 0) '[& c]))
-    (is (= (matching-arity #'only-n-ary 1) '[& c]))
-    (is (= (matching-arity #'only-n-ary 500) '[& c])))
+    (is (= (h/matching-arity #'only-n-ary 0) '[& c]))
+    (is (= (h/matching-arity #'only-n-ary 1) '[& c]))
+    (is (= (h/matching-arity #'only-n-ary 500) '[& c])))
   (testing "can use bare arglist coll"
-    (is (= (matching-arity '[[] [a b & c] [a b]] 2)
+    (is (= (h/matching-arity '[[] [a b & c] [a b]] 2)
            '[a b]))
     (testing "including if reversed"
-      (is (= (matching-arity '[[] [a b] [a b & c]] 2)
+      (is (= (h/matching-arity '[[] [a b] [a b & c]] 2)
              '[a b]))))
   (testing "can use var meta"
-    (is (= (matching-arity {:arglists '[[] [a b & c] [a b]]} 2)
+    (is (= (h/matching-arity {:arglists '[[] [a b & c] [a b]]} 2)
            '[a b]))))
 
 ;;;; Sandboxing
@@ -130,9 +131,9 @@
   (is (nil? (resolve 'join)))
   (is (nil? (resolve 'Color)))
   (is (= test-a 8)) ;; TODO: Why does resolve fail here?
-  (is (= (with-temp-ns [(use '[clojure.string :only (join)])
-                        (import 'java.awt.Color)
-                        (def test-inner-b 12)]
+  (is (= (h/with-temp-ns [(use '[clojure.string :only (join)])
+                          (import 'java.awt.Color)
+                          (def test-inner-b 12)]
            (if (resolve 'with-temp-ns)
              (throw (AssertionError. "Oops, captured outer 'use")))
            (if (resolve 'test-a)
@@ -147,17 +148,17 @@
 (deftest get-errors
   ;; error in body
   (is (thrown-with-msg? Throwable #"testing-body" ;; might be wrapped exception
-        (with-temp-ns [] (throw (RuntimeException. "testing-body")))))
+        (h/with-temp-ns [] (throw (RuntimeException. "testing-body")))))
   ;; error in ns
   (is (thrown-with-msg? Throwable #"testing-ns"
-        (with-temp-ns [(throw (RuntimeException. "testing-ns"))])))
+        (h/with-temp-ns [(throw (RuntimeException. "testing-ns"))])))
   ;; even compilation errors
   (is (thrown? clojure.lang.Compiler$CompilerException
-               (with-temp-ns [(no-such 5 6 7)] (+ 4 5)))))
+               (h/with-temp-ns [(no-such 5 6 7)] (+ 4 5)))))
 
 (deftest runtime-sequential-ns
-  (is (= (with-temp-ns [(import 'java.awt.Point)
-                        (def a (.getCanonicalName Point))]
+  (is (= (h/with-temp-ns [(import 'java.awt.Point)
+                          (def a (.getCanonicalName Point))]
            a)
          "java.awt.Point")))
 
@@ -167,44 +168,46 @@
     (throw (RuntimeException. "Could not resolve"))))
 
 (deftest compile-sequential-ns
-  (is (= (with-temp-ns [(import 'java.awt.Shape)
-                        (require 'org.timmc.t-handy)
-                        (def a (org.timmc.t-handy/resolver Shape))]
+  (is (= (h/with-temp-ns [(import 'java.awt.Shape)
+                          (require 'org.timmc.t-handy)
+                          (def a (org.timmc.t-handy/resolver Shape))]
            (+ 2 3))
          5)))
 
 ;;;; Structural
 
 (deftest indexing
-  (is (= (index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}] (juxt :a :b) [:c])
+  (is (= (h/index-on [{:a 0, :b 1, :c 2}, {:a 3, :b 4, :c 5}]
+                     (juxt :a :b)
+                     [:c])
          {[0 1] {:c 2}, [3 4] {:c 5}})))
 
 ;;;; Mutation
 
 (deftest splitting
   (let [a (atom (range 10))]
-    (is (= (split-atom! a first rest) 0))
+    (is (= (h/split-atom! a first rest) 0))
     (is (= @a (range 1 10))))
   (testing "Error in keep does not alter atom"
     (let [a (atom (range 10))]
-      (is (thrown? Exception (split-atom! a first inc)))
+      (is (thrown? Exception (h/split-atom! a first inc)))
       (is (= @a (range 10)))))
   (testing "Error in return does not alter atom"
     (let [a (atom (range 10))]
-      (is (thrown? Exception (split-atom! a inc rest)))
+      (is (thrown? Exception (h/split-atom! a inc rest)))
       (is (= @a (range 10))))))
 
 ;;;; Testing
 
 (deftest calvinism
-  (let [f (deterministic 0 1 2 3 4)]
+  (let [f (h/deterministic 0 1 2 3 4)]
     (is (= (map f [:a :b :c :d]) (range 0 4)))
     (is (= (f 'various 'things) 4))))
 
 (deftest tabular
   (let [[call, t1 t2, desc-bind k-bind n-bind, & variations]
         (macroexpand-1
-                (list `tabular-delta
+                (list `h/tabular-delta
                       'test-1
                       'test-2
                       (sorted-map '?k :a '?n 1)
@@ -219,7 +222,7 @@
 
 (deftest pagination
   (testing "error conditions"
-    (are [total cp result] (= (paging total cp 10)
+    (are [total cp result] (= (h/paging total cp 10)
                               (assoc result
                                 :total total, :cur-page cp, :per-page 10))
          ;; empty -- always invalid
@@ -235,7 +238,7 @@
   (testing "normal conditions (3 pages)"
     (let [constant {:has-records true, :cur-valid true,
                     :first-page 0, :last-page 2}]
-      (are [total cp result] (= (paging total cp 10)
+      (are [total cp result] (= (h/paging total cp 10)
                                 (assoc (into result constant)
                                   :total total, :cur-page cp, :per-page 10))
            ;; ragged results (last page not full)
