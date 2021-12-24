@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- 
+- Add support for Clojure 1.9 (fix bug in if-let+ that only spec
+  complained about)
 
 ## 1.7.1 - 2016-12-23
 - Confirmed Clojure 1.7.0, 1.8.0 support

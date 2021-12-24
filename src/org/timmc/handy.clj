@@ -15,7 +15,7 @@ of the bindings, and the then-expression may use all of them."
   (when-not (even? (count bindings))
     (throw (RuntimeException. "if-let+ bindings count must be even")))
   (let [else-sym (gensym "else_")]
-    `(let [~else-sym (fn delay-else [] ~else-expr)]
+    `(let [~else-sym (fn delay-else# [] ~else-expr)]
        ~(reduce
          (fn [core clause]
            ;; fully-qualify if-let in case we decide to rename this macro
