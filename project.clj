@@ -6,8 +6,8 @@
             :distribution :repo}
   ;; lein 1.x repl throws with :repl-options :init-ns, so use :main instead
   :main ^:skip-aot org.timmc.handy
-  ;; lein 2.x repl throws on Clojure 1.2.0, so use 1.3.0 instead
-  :dependencies [[org.clojure/clojure "1.3.0"]]
+  ;; lein 2.8.2 repl needs at least Clojure 1.7.0
+  :dependencies [[org.clojure/clojure "1.7.0"]]
   ;; All versions of Clojure that we want to test against (including
   ;; default dependency.)
   :profiles {:1.2.0 {:dependencies [[org.clojure/clojure "1.2.0"]]}
