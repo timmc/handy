@@ -2,6 +2,20 @@
   (:require [org.timmc.handy :as h])
   (:use clojure.test))
 
+(defmacro strip-compiler-exception
+  "If the body throws an exception, and the exception is the compiler
+exception introduced in Clojure 1.10.0, strip it off and re-raise the
+cause instead.
+
+This is a gross hack to allow compatibility for both 1.10 and earlier."
+  [& body]
+  `(try
+     ~@body
+     (catch Throwable t#
+       (if (= (.getName (class t#)) "clojure.lang.Compiler$CompilerException")
+         (throw (.getCause t#))
+         (throw t#)))))
+
 ;;;; testing
 
 (defn sign
@@ -53,7 +67,8 @@
     (is (= (h/if-let+ [] 4 5) 4)))
   (testing "no throwing things away"
     (is (thrown-with-msg? Exception #"bindings.*even"
-                          (macroexpand-1 '(h/if-let+ [one] 2 3))))))
+                          (strip-compiler-exception
+                           (macroexpand-1 '(h/if-let+ [one] 2 3)))))))
 
 ;;;; Comparisons
 

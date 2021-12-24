@@ -20,8 +20,9 @@
              :1.7.0 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.8.0 {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :1.9.0 {:dependencies [[org.clojure/clojure "1.9.0"]]}
+             :1.10.3 {:dependencies [[org.clojure/clojure "1.10.3"]]}
              :dev {:plugins [[lein-release "1.0.5"]]}}
-  :aliases {"all-clj" ["with-profile" "+1.2.0:+1.2.1:+1.3.0:+1.4.0:+1.5.0:+1.5.1:+1.6.0:+1.7.0:+1.8.0:+1.9.0"]}
+  :aliases {"all-clj" ["with-profile" "+1.2.0:+1.2.1:+1.3.0:+1.4.0:+1.5.0:+1.5.1:+1.6.0:+1.7.0:+1.8.0:+1.9.0:+1.10.3"]}
   :global-vars {*warn-on-reflection* true}
   :lein-release {:scm :git
                  :deploy-via :shell
