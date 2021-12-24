@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+-
+
+## 1.7.2 - 2021-12-24
 - Add support for Clojure 1.9 and 1.10
     - Fix bug in if-let+ that only spec complained about
     - Update test for compatibility
